@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data Center Inventory</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Data Center Inventory Management</h1>
+    <p class="subtitle">Hardware inventory and stock management dashboard</p>
+
+    <div class="stats">
+        <div class="card">
+            <p>Total Components</p>
+            <h2 id="total-components">{{ total_components }}</h2>
+        </div>
+
+        <div class="card">
+            <p>Total Units</p>
+            <h2 id="total-units">{{ total_units }}</h2>
+        </div>
+
+        <div class="card">
+            <p>Low Stock Items</p>
+            <h2 id="low-stock">{{ low_stock }}</h2>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    
+<div class="panel">
+    <h2>Current Inventory</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Quantity</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+
+        <tbody id="inventory-body">
+            {% for row in rows %}
+            <tr data-component="{{ row[0] }}"
+                data-quantity="{{ row[1] }}"
+                data-location="{{ row[2] }}">
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+    <div class="panel">
+        <h2>Manage Inventory</h2>
+
+        <form id="stock-form" method="POST" action="{{ url_for('inventory') }}">
+            <select name="component" required>
+                {% for row in rows %}
+                    <option value="{{ row[0] }}">{{ row[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="number" name="units" min="1"
+                   placeholder="Quantity" required>
+
+            <button class="receive" name="action" value="receive">
+                Receive Stock
+            </button>
+
+            <button class="issue" name="action" value="issue">
+                Issue Stock
+            </button>
+        </form>
+        {% if demo_mode %}
+            <p id="demo-message" class="message">
+                Interactive demo — changes are temporary.
+            </p>
+
+            <button type="button" id="reset-demo">
+                Reset Demo
+            </button>
+        {% endif %}
+    </div>
+
+</div>
+{% if demo_mode %}
+<script
+    src="{{ url_for('static', filename='demo.js') }}"
+    defer>
+</script>
+{% endif %}
+</body>
+</html>
